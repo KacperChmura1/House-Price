@@ -1,1 +1,2 @@
-PlanProjektu.txt
+PlanProjektu/
+.ipynb_checkpoints/
