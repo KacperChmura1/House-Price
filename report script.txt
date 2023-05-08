@@ -1,0 +1,138 @@
+
+Rozdział 1. Usuwanie wartości odstających!
+
+Zdecydowaliśmy się dla poprawienia skuteczności naszej analizy wyrzucić skrajne wartości z naszego zbioru danych. Konkretnie 2% najdroższych mieszkań oraz głównie dla zachowania balansu 2% najtańszych. Zbiór przedstawiajacy ceny mieszkań z naszego zbioru danych przedstawia wykres poniżej. Możemy na nim zaobserwować, że co najmniej kilka/kilkadziesiąt wartości zdecydowanie odstaje od pozostały. Z tego powodu postanowiliśmy nie uwzględniać ich w naszej analizie.
+
+<odstajace1>
+
+Usunięcie wartości odstających.
+<odstajace2>
+
+Różnice między zbiorami możemy zaobserwować na poniższych wykresach.
+
+<Odstajace3>  <odstajace4>
+
+
+Rozdział 2. OneHotEncoding oraz rozdzielanie danych!
+
+Do poprawnego funkcjonowania modele uczenia maszynowego wymagają danych zapisanych w formie liczbowym(int, float, etc.) dlatego też zmienne zapisane w naszym zbiorze danych jako napisy(string) zostały zamienione na liczbowe za pomocą funkcji z pakietu pandas o nazwie get_dummies.
+
+<podzial1>
+
+Dane po odpowiedniej zmianie typu muszą zostać rozdzialone na odpowiednie zbiory. W pierwsze kolejności zostają one przypisane do zmiennych y oraz X, gdzie y jest etykietą(Ceną mieszkania) tzn wartością, którą ma nasz model przewidywać. Natomiast X jest wszystkim innym czyli zmiennymi na podstawie, których nasz przyszły model ma przewidzieć cene mieszkania. Kolejnym krokiem jest rozdzielenie powstałych w ten sposób zbiorów na treningowe oraz testowe. Zbiory treningowe X_train oraz y_train posłużą do uczenia modeli uczenia maszynowego, natomiast zbiory testowe X_test oraz y_test do sprawdzania wyników naszego modelu. Cały podział odbywa się za pomocą funkcji train_test_split z pakietu sklearn. Funkcja przyjmuje rozdzielone zmienne X,y oraz parametry takie jak test_size odpowiadajacy za rozmiar zbioru testowego (w naszym przypadku 20%) oraz random_state jest swego rodzajem ziarnem służącym do wyboru, które wiesze mają trafić do zbioru testowego, a które do uczącego. Random_state przyjmuje liczbe całkowitą jako wartość ziarna według, której konkretne wiersze trawiaja do danego podzbioru test lub train.
+
+
+Rozdział 3. Walidacja krzyżowa w celu sprawdzenia możliwości modeli uczenia maszynowego.
+Wyjaśnienie???
+
+
+
+Za pomocą walidacji krzyżowej przetesowaliśmy takie modele jak Support Vector Machine Regressor, Linear Regression, KNN Regressor, Decision Tree Regresor oraz Random Forest Regressor. Walidacja krzyżowa daje bardziej miarodajne wyniki niż zwykłe testowanie modeli, ponieważ jako zbiór treningowy wykorzystuje wszystkie dane. W naszym przypadku wykorzystaliśmy podział cv = 10, co oznacza że każdy zbiór został podzielony na 10 części. Nastepnie dany model uczył się na 9 częściach oraz sprawdzany na tej ostatniej nie użytej do nauki, wynik uzyskany został zapisany, a cały proces został powtórzony jeszcze 9 razy za każdym razem ze zmianą części użytej do sprawdzenia. Po 10 takich iteracjach została wyciągnięta średnia jak wynik całego procesu.
+
+DLaczego Walidacja krzyżowa?
+
+Walidacja krzyżowa (cross-validation) jest lepsza od zwykłego testowania modeli z kilku powodów:
+
+Lepsze wykorzystanie danych: Walidacja krzyżowa pozwala na bardziej efektywne wykorzystanie dostępnych danych. Zamiast podzielić zestaw danych na jedną próbkę testową i treningową, walidacja krzyżowa dzieli je na kilka podzbiorów, z których jeden jest używany jako zbiór testowy, a pozostałe jako zbiory treningowe. Dzięki temu każda próbka danych jest wykorzystywana zarówno do treningu, jak i do testowania modelu, co prowadzi do bardziej wiarygodnych wyników.
+
+Wiarygodniejsza ocena modelu: Walidacja krzyżowa zapewnia bardziej wiarygodną ocenę jakości modelu. Podczas zwykłego testowania, wynik może być uzależniony od przypadkowego podziału danych na zbiory testowe i treningowe. W przypadku walidacji krzyżowej, wynik jest uśredniany z kilku prób, gdzie każda próba używa innego podziału danych. Pozwala to na bardziej obiektywne oszacowanie skuteczności modelu.
+
+Lepsze wykrywanie przeuczenia (overfittingu): Walidacja krzyżowa jest skuteczniejsza w wykrywaniu przeuczenia modelu. Przeuczenie występuje, gdy model jest zbyt mocno dopasowany do danych treningowych i słabo generalizuje na nowe dane. Przy użyciu walidacji krzyżowej można wykryć ten problem poprzez porównanie wyników na różnych podzbiorach danych. Jeśli model jest przeuczony, to wyniki na zbiorze testowym będą gorsze niż na zbiorze treningowym.
+
+Lepszy podział danych treningowych i testowych: Walidacja krzyżowa pozwala na lepszy podział danych treningowych i testowych. W zwykłym testowaniu często zdarza się, że niektóre ważne wzorce mogą być pomijane przez przypadek, gdy zostaną one umieszczone w zbiorze testowym. Walidacja krzyżowa pozwala na uwzględnienie wszystkich próbek danych zarówno w zbiorze treningowym, jak i testowym w różnych kombinacjach, co pozwala na bardziej kompleksową ocenę modelu.
+
+Lepsza reprezentatywność wyników: Walidacja krzyżowa pozwala na uzyskanie bardziej reprezentatywnych wyników. Dzięki uśrednianiu wyników z wielu prób, możemy uzyskać bardziej stabilne i wiarygodne oszacowanie skuteczności modelu. Wyniki z jednej próby mogą być podatne na losowe fluktuacje, ale uśrednione wyniki z wielu prób są bardziej niezawodne.
+
+Wyniki walidacji krzyżowej
+
+Wartym oddnotowania jest fakt że modele użyte przez na w teście walidacji krzyżowej był testowane bez jakichkoliwek zmian hyperparametrów. Walidacja krzyżowa pokazała, które modele najbardziej nadają się do dalszego rozwoj. Są to Ridge, KNeighborsRegressor, DecisionTreeRegressor oraz RandomForestRegressor, odrzuciliśmy dwa modele liniowe takie jak SVR oraz LinearRegression. Nie oznacza to jedna że modele liniowe nie sprawdziły się w naszym teście, ponieważ doskonale wypadł model będącym usprawnioną regresją liniową czyli Ridge Regression. 
+
+<crossvalidation>
+
+
+Testowanie modeli przewidujących ceny mieszkań.
+
+W celu porównania modeli uczenia maszynowego stworzona zostałą funkcja "ml", przyjmująca argumenty takie jak:
+df - ramka danych potrzebnych do nauki modelu
+model - instancja modelu który zostanie użyty
+grid - zmienna która decyduje czy użyć GridSearchCV sprawdzającej każdą kombinacje zadanych parametrów w kolejnym argumencie grid_params
+grid_params domyślnie przyjmująca zero służy głównie do przechowywania słownika potrzebnego funkcji GridSearchCV do znalezienia odpowiedniej kombinacji parametrów modelu.
+
+Funkcja na początku dzieli lokalnie zbiór danych na podzbiory za pomocą train_test_split, następnie sprawdza czy użytkownik chce użyć GridSearchCV czy też nie za pomocą zmiennej Grid, która z koleji przyjmuje wartości True lub False. W dalszej częsci model uczy się na zbiorach treningowych, później przywiduje wynik na podstawie zbioru testowego. Żeby w późniejszej części prównać go z prawidłowymi wynikami za pomocą takcih metryk jak MAE, RMSE oraz R2 Score. Wyniki są również wyświetlane na wykresie, który demonstruje jak bardzo predykcje modelu odbiegają od prawidłowych wartości. Na sam koniec jeśli użytkownik wybrał, że chce skożystać z GridSearchCV wyświetlona zostaje najlepsza kombinacja parametrów. W dalszej części zaprezentowane zostanie działanie funkcji w praktyce.
+
+<funkcjatestujaca>
+
+Ridge Regression
+
+Ridge Regression jest rozserzeniem regresji liniowej wprowadzającym dodatkową regularyzajce L2. Dzięki regularyzacji L2, Ridge Regression daje elastyczność w dostosowywaniu modelu do danych treningowych i jednocześnie pomaga w unikaniu zbytniego dopasowania.
+W tradycyjnej regresji liniowej dąży się do minimalizacji sumy kwadratów różnic między przewidywanymi wartościami a rzeczywistymi wartościami. Ridge Regression dodaje do tego celu dodatkowy składnik, który jest proporcjonalny do kwadratu normy L2 współczynników regresji. Kluczowym parametrem dla regresji ridge jest parametr alfa wyznaczający to jak wysoka będzie kara za złożoność. Im większa wartość alpha, tym większa kara za złożoność, co prowadzi do bardziej ograniczonych wartości wag. To ograniczenie wartości wag ma na celu zmniejszenie wpływu poszczególnych cech na model, zapobieganie zbytniemu dopasowaniu i poprawę ogólnej zdolności do generalizacji na nowych danych.
+
+Dodanie regularyzacji L2 pomaga w redukcji przeuczenia (overfittingu) i poprawie stabilności modelu, szczególnie gdy mamy do czynienia z dużą liczbą cech lub kiedy cechy są silnie skorelowane. Regularyzacja L2 działa poprzez równoczesne minimalizowanie błędu dopasowania danych treningowych oraz ograniczanie wartości wag, co pozwala na uzyskanie bardziej wyważonego modelu.
+
+<Ridge> - odpowiedni podpis
+
+
+Zastosowanie Ridge Regression jako modelu przewidującego ceny mieszkań.
+
+<Ridge2>  - odpowiedni podpis
+
+Parametry:
+
+Parametr "tol" w modelu Ridge Regression jest wartością progową, która kontroluje warunek zbieżności algorytmu optymalizacji podczas uczenia modelu. Im mniejsza wartość tol, tym bardziej precyzyjne jest kryterium zbieżności, ale wymaga to więcej iteracji. Warto dostosować tol, aby znaleźć odpowiedni kompromis między czasem uczenia a precyzją wyników.
+
+Parametr "alfa" w Ridge Regression kontroluje siłę regularyzacji, czyli wpływ kary za złożoność modelu. Większa wartość alfa prowadzi do większej kary i bardziej ograniczonych wag, co pomaga w zapobieganiu zbytniemu dopasowaniu. Optymalne dobranie wartości alfa jest ważne dla zachowania równowagi między dopasowaniem a regularyzacją.
+
+Wyniki:
+
+Wybrane zostały następujące parametry: 'alpha': 10, 'random_state': 101, 'tol': 1e-05. Wysoki poziom parametru alfa, może świadczyć o sporej liczbie zmiennych nie wnoszących zbyt wiele do predykcji ceny mieszkańa. Dla przypomnienia zbiór posiada ponad cztery tysiące zmiennych.
+
+Wynik jaki uzyskał model Ridge okazał się zaskakująco dobry ponieważ R2 Score wyniósł niespełna 0.89 co przełożyło się między innymi na średni błąd poniżej 8.5%. Różnica pomiędzy modelami Linear Regression, a Ridge również może świadczyć, że ograniczenie złożoności modelu pozytywnie wpyłwa na wynik. Co potwierdza hipoteze, że spora część zmiennych ze zbioru danych jest niezbyt użyteczna. Wartym odnotwania jest fakt, że model dobrze radzi sobie z przewidywaniem ceny mieszkań z dowolnej półki cenowej co prezentuje wykres Predukcje vs. właściwe ceny domów.
+
+KNN Regression
+
+<KNN>  - odpowiedni podpis
+
+Parametry:
+
+Parametr "n_neighbors" w KNN Regressor służy do określenia liczby sąsiadów branych pod uwagę podczas prognozowania wartości docelowych dla nowych obserwacji. Jest to jeden z kluczowych parametrów w algorytmie k-najbliższych sąsiadów (KNN), gdzie obiekt jest przewidywany na podstawie podobieństwa do najbliższych sąsiadów w zbiorze treningowym. Wybór optymalnej wartości n_neighbors może mieć wpływ na wydajność i dokładność modelu KNN, zbyt mała wartość może prowadzić do nadmiernego dopasowania, podczas gdy zbyt duża może prowadzić do niedostatecznego dopasowania.
+
+Parametr 'weights' w KNN Regressor służy do określenia sposobu wagowania sąsiadów podczas prognozowania wartości docelowych dla nowych obserwacji. Istnieją dwie opcje: 'uniform' i 'distance'. Dla 'uniform', wszyscy sąsiedzi mają taką samą wagę, podczas gdy dla 'distance', wagi są odwrotnie proporcjonalne do odległości od nowej obserwacji. Wybór odpowiedniego sposobu wagowania zależy od charakteru danych i problemu, gdzie 'uniform' może być stosowane, gdy wszystkie punkty są równie ważne, a 'distance' może dawać lepsze wyniki, jeśli bliżsi sąsiedzi mają większy wpływ na prognozowanie.
+
+Parametr 'metric' w KNN Regressor służy do określenia metryki używanej do obliczania odległości między obserwacjami w algorytmie k-najbliższych sąsiadów (KNN). Domyślnie wartość tego parametru to 'euclidean', co oznacza obliczanie odległości Euklidesowej. Jednak można również wybrać inne metryki, takie jak 'manhattan' (odległość Manhattan), 'minkowski' (ogólna metryka Minkowskiego) czy 'chebyshev' (odległość Czebyszewa), w zależności od charakterystyki danych i potrzeb problemu. Wybór odpowiedniej metryki ma istotny wpływ na dokładność i efektywność modelu KNN, ponieważ różne metryki mogą lepiej odzwierciedlać specyfikę danych i strukturę przestrzeni.
+
+Wyniki:
+
+Wybrane zostały następujące parametry: 'algorithm': 'auto', 'metric': 'cityblock', 'n_neighbors': 9, 'weights': 'distance'.
+
+Wynik modelu KNN nie wypadł tak dobrze jak w przypadku Ridge, metryki takie jak R2 Score oraz średni błąd są znacząco gorsze niż w przypadku wczesniej opisanego modelu liniowego. Poziom błędu na poziomie przewyższającym 14% jest zdecydowanie za wysoki, aby model ten mógł być użyty w celu analizy danych dotyczących ceny mieszkań. 
+
+
+DecisionTreeRegressor
+
+<Tree>  - odpowiedni podpis
+
+Parametry:
+
+Parametr 'min_impurity_decrease' w Decision Tree Regressor służy do kontrolowania minimalnego spadku impurity (czystości) w węźle, który jest wymagany do kontynuacji podziału. Wartość tego parametru określa minimalną różnicę impurity, która musi być osiągnięta w wyniku podziału węzła. Jeśli spadek impurity jest mniejszy niż wartość 'min_impurity_decrease', podział w tym węźle nie zostanie wykonany. Parametr ten jest używany do regularyzacji modelu i zapobiegania nadmiernemu dopasowaniu. Wybór optymalnej wartości 'min_impurity_decrease' zależy od charakteru danych i pożądanego poziomu regularyzacji, gdzie większa wartość prowadzi do prostszych drzew i ogranicza podziały o niewielkim spadku impurity.
+
+
+Wyniki:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
