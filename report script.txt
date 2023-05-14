@@ -59,7 +59,17 @@ grid - zmienna która decyduje czy użyć GridSearchCV sprawdzającej każdą ko
 grid_params domyślnie przyjmująca zero służy głównie do przechowywania słownika potrzebnego funkcji GridSearchCV do znalezienia odpowiedniej kombinacji parametrów modelu.
 
 Funkcja na początku dzieli lokalnie zbiór danych na podzbiory za pomocą train_test_split, następnie sprawdza czy użytkownik chce użyć GridSearchCV czy też nie za pomocą zmiennej Grid, która z koleji przyjmuje wartości True lub False. W dalszej częsci model uczy się na zbiorach treningowych, później przywiduje wynik na podstawie zbioru testowego. Żeby w późniejszej części prównać go z prawidłowymi wynikami za pomocą takcih metryk jak MAE, RMSE oraz R2 Score. Wyniki są również wyświetlane na wykresie, który demonstruje jak bardzo predykcje modelu odbiegają od prawidłowych wartości. Na sam koniec jeśli użytkownik wybrał, że chce skożystać z GridSearchCV wyświetlona zostaje najlepsza kombinacja parametrów. W dalszej części zaprezentowane zostanie działanie funkcji w praktyce.
+########################################################################################################################################################################################################
+Metryki oceny modelu.
 
+MAE (Mean Absolute Error) i RMSE (Root Mean Squared Error) to popularne metryki używane w problemach regresji do oceny jakości predykcji modelu.
+
+MAE mierzy średnią wartość bezwzględną błędów predykcji modelu, czyli średnią różnicę pomiędzy wartością rzeczywistą a wartością przewidywaną. MAE jest łatwy do interpretacji i nie wrażliwy na wartości odstające.
+
+RMSE, podobnie jak MAE, mierzy błędy predykcji, ale jest to średnia kwadratowa różnica pomiędzy wartością rzeczywistą a wartością przewidywaną. Ponieważ RMSE bierze pod uwagę kwadrat błędów, to większe błędy są bardziej karane niż w przypadku MAE. RMSE jest często stosowany, gdy chcemy zwrócić uwagę na duże błędy predykcji.
+
+R2 Score (lub R-squared) to metryka, która mierzy dopasowanie modelu do danych. R2 Score jest liczbą z zakresu od 0 do 1, gdzie wartość 1 oznacza idealne dopasowanie modelu do danych, a wartość 0 oznacza, że model nie wyjaśnia zmienności danych w ogóle. R2 Score wyraża proporcję zmienności danych, która jest wyjaśniona przez model. W praktyce, R2 Score jest używany jako miara wydajności modelu, która pokazuje, jak dobrze model przewiduje zmienność danych. Wartości R2 Score powyżej 0,7 zazwyczaj uważane są za dobre dopasowanie modelu.
+########################################################################################################################################################################################################
 <funkcjatestujaca>
 
 Ridge Regression
@@ -115,12 +125,79 @@ Parametry:
 
 Parametr 'min_impurity_decrease' w Decision Tree Regressor służy do kontrolowania minimalnego spadku impurity (czystości) w węźle, który jest wymagany do kontynuacji podziału. Wartość tego parametru określa minimalną różnicę impurity, która musi być osiągnięta w wyniku podziału węzła. Jeśli spadek impurity jest mniejszy niż wartość 'min_impurity_decrease', podział w tym węźle nie zostanie wykonany. Parametr ten jest używany do regularyzacji modelu i zapobiegania nadmiernemu dopasowaniu. Wybór optymalnej wartości 'min_impurity_decrease' zależy od charakteru danych i pożądanego poziomu regularyzacji, gdzie większa wartość prowadzi do prostszych drzew i ogranicza podziały o niewielkim spadku impurity.
 
+########################################################################################################################################################################################################
+
+Parametr ccp_alpha (czyli Cost Complexity Pruning alpha) to parametr, który wpływa na proces przycinania drzewa decyzyjnego w algorytmie regresji drzewa decyzyjnego z ograniczeniami. Przycinanie drzewa decyzyjnego polega na usuwaniu nieistotnych węzłów z drzewa, aby zmniejszyć jego złożoność i zapobiec nadmiernemu dopasowaniu (overfitting).
+
+Parametr criterion to parametr, który określa kryterium podziału węzłów w drzewie decyzyjnym. Wyróżniamy mse ora friedman_mse, który jest zmodyfikowaną wersją mse.
 
 Wyniki:
 
+Wybrane zostały następujące parametry:  {'ccp_alpha': 0.3, 'criterion': 'absolute_error', 'min_impurity_decrease': 0.0001, 'random_state': 101}.
+
+Wyniki modelu pojedynczego Drzewa Decyzyjnego tak jak można się było spodziewać nie okazały się zbyt zadawalające, model ten uzyskał wyższy poziom błędów MAE oraz RMSE a co za tym idzie jego R2 Score rówanież był zdecydowanie wyższy od poprzedników. Nie mniej jednak spodziewaliśmy się podobnych wyników, rozpoczynając tą analize zdecydowaliśmy wytrenować oraz sprawdzić najlepsze do naszego zbioru danych hyperparametry dla drzewa decyzyjnego głównie dlatego że chcemy to drzewo decyzyjne wykorzystać w następnych modelach. Kolejne trzy modele będą modelami opartymi na drzewach decyzyjnych, a w jendym z nich bezpośrednio wykorzystamy drzewo ze zdefiniowanymi parametrami powyżej.
 
 
+RandomForestRegressor
+<RandomForest1> - odpowiedni opis
 
+
+Parametry:
+
+bootstrap - parametr binarny (True/False), określający, czy w procesie budowy każdego drzewa decyzyjnego należy losować próbkę danych z powtórzeniami (zastąpieniami) czy bez powtórzeń (bez zastąpień). W przypadku, gdy bootstrap=True, drzewo będzie budowane na podstawie losowego podzbioru próbek, co zwiększa zróżnicowanie drzew i pomaga w uniknięciu przeuczenia.
+
+ccp_alpha - parametr, który określa minimalną wielkość kosztu cięcia (ang. cost complexity pruning), który musi zostać osiągnięty, aby węzeł był przycinany. Im wyższa wartość ccp_alpha, tym bardziej agresywnie dokonywane jest przycinanie drzewa, co może prowadzić do uproszczenia modelu i zmniejszenia jego skłonności do przeuczenia.
+
+n_estimators - liczba drzew decyzyjnych w lesie losowym. Im wyższa wartość parametru, tym bardziej skomplikowany będzie model i tym większe prawdopodobieństwo uzyskania dokładniejszych wyników, ale zwiększy się też czas trenowania i predykcji. Z drugiej strony, zbyt mała wartość n_estimators może prowadzić do niedouczenia modelu.
+
+Wyniki:
+
+Wybrane zostały następujące parametry:{'bootstrap': True, 'ccp_alpha': 0.02, 'n_estimators': 400, 'random_state':101}
+
+W przypadku RandomForest wyniki okazały się znacznie lepsze niż w przypadku pojedynczego drzewa. Powodem tego jest fakt, że dane na których operujemy są wysoce złozone nawet w pierwotnej formie posiadały ponad 70 kolumn, gdzie po zastosowaniu OneHotEncoding ta liczba wzrosła do 4000. Z tego powodu modele takie jak pojedyncze drzewo decyzyjne nie radzą sobie tak dobrze jak ich bardziej złożone odpowiedniki.
+
+
+AdaBoost
+
+W tym modelu bezpośrednio użyjemy wcześniej zdefiniowanego drzewa decyzyjnego z poprzedniego rozdziału.
+<AdaBoost1>
+
+Parametry:
+W przypadku AdaBoost nie było potrzeby definiować takiej ilości hyperparametrów jak w przypadku poprzenich modeli, głównie dlatego że Adaptive Boost wykorzystuje wcześniej zdefiniowane (pod kątem hyperparametrów) drzewo decyzyjne. Dlatego też nie używaliśmy w tym przypadku GridSearchCV, a jedyne parametry jakie zdefiniowaliśmy, dotyczył:
+n_estimators - ilości drzew wykorzystywanych przez model.
+base_estimators - definicja jakie ma być to drzewo, zdecydowaliśmy się na użycie drzewa zdefiniowanego wcześniej.
+learning_Rate - współczynnik określający, jak bardzo każde nowe drzewo decyzyjne będzie próbowało poprawić błędy modelu w poprzednich iteracjach.
+
+<AdaBoost2>
+
+Wyniki
+
+AdaBoost osiągnał wynik zbliżony do Randomforest nieznacznie go przebijając, wartym jednak odnotowania jest fakt, że potrzebował na to kilkukortnie więcej czasu od swojego poprzednika na sam trening.
+
+Gradient Boost
+
+<GradientBoost1>
+
+Parametry:
+
+n_estimators: liczba drzew decyzyjnych, które zostaną zbudowane przez algorytm Gradient Boost. Im większa wartość parametru, tym bardziej złożony będzie model, ale jednocześnie wzrośnie też czas trenowania i predykcji.
+
+learning_rate: współczynnik określający, jak bardzo każde nowe drzewo decyzyjne będzie próbowało poprawić błędy modelu w poprzednich iteracjach. Im wyższa wartość parametru, tym większe będą korekty i tym bardziej skomplikowany będzie model.
+
+min_impurity_decrease: minimalna zmiana impurity, która musi zostać osiągnięta, aby węzeł drzewa decyzyjnego był podzielony. Im wyższa wartość parametru, tym bardziej agresywnie dokonywane jest przycinanie drzewa, co może prowadzić do uproszczenia modelu i zmniejszenia jego skłonności do przeuczenia.
+
+tol: wartość progowa określająca minimalną wartość zmiany funkcji kosztu między kolejnymi iteracjami, która jest wymagana, aby algorytm zakończył iteracje. Im mniejsza wartość parametru, tym więcej iteracji jest potrzebnych, aby algorytm zakończył pracę.
+
+max_depth: maksymalna głębokość drzewa decyzyjnego. Im większa wartość parametru, tym bardziej skomplikowany i bardziej dopasowany do danych będzie model, ale jednocześnie będzie bardziej skłonny do przeuczenia.
+
+ccp_alpha: parametr określający minimalną wielkość kosztu cięcia, która musi zostać osiągnięta, aby węzeł drzewa decyzyjnego był przycinany. Im wyższa wartość parametru, tym bardziej agresywnie dokonywane jest przycinanie drzewa, co może prowadzić do uproszczenia modelu i zmniejszenia jego skłonności do przeuczenia.
+
+Wyniki 
+
+Wybrane zostały następujące parametry: {n_estimators=250, min_impurity_decrease=0.0001,tol=0.00001,learning_rate=0.125, max_depth=5, ccp_alpha=0.01}
+
+GradientBoost, tak jak dwa poprze wykorzystujący wiele drzew poradził sobie znakomicie z przewidywaniem ceny domów. Wynik, w którym średni błąd osiąga poziom poniżej 8 % jest zdecydowanie zadowalający. Można powiedzieć, że model ten jest bardzo podobny do RandomForest, ponieważ tak samo wykorzystuje wiele drzew decyzyjnych. Różnica jednak pomiędzy nimi jest diametralna. GradientBoost w przeciwieństwie do RandomForest nie traktuje każdego nowego drzewa jako osobny byt, kolejne drzewa w tym modelu "uczą" się na błędach poprzedników. 
+########################################################################################################################################################################################################
 
 
 
